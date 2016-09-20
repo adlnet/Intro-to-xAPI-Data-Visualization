@@ -1,7 +1,7 @@
 # Hands On Reporting
 Welcome to the hands on portion of the session. The following are some challenges to highlight ADL's Dashboard and Collection libraries, while giving you exposure to working with statements. The xAPI Dashboard is included in the GitHub project for your use, or download the dashboard files [here](https://github.com/adlnet/xAPI-Dashboard/releases/tag/v1.2.1).  
   
-The following is a template you can use for the bar charts. Please note that the `<script>` elements may need to be updated to point to the location of the Dashboard files (nv.d2.css, xapidashboard.min.js & xapicollection.min.js). Optionally, you may use this [codepen example](http://codepen.io/anon/pen/XbqyrN) as a base temple, or example.  
+The following is a template you can use for the bar charts. Please note that the `<script>` elements may need to be updated to point to the location of the Dashboard files (nv.d2.css, xapidashboard.min.js & xapicollection.min.js). Optionally, you may use this [codepen example](http://codepen.io/anon/pen/XbqyrN) as a base template, or example.  
   
 ```html
 <!doctype html>
