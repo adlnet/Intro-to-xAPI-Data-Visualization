@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+<head>
+    <script type="text/javascript" src="./xAPI-Dashboard-development/lib/xapiwrapper.min.js"></script>
+    <script type="text/javascript" src="./xAPI-Dashboard-development/dist/xapicollection.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Set xAPI endpoint
+            var conf = {"endpoint":"https://lrs.adlnet.gov/xapi/", "auth":"Basic " + toBase64('tom:1234')};
+            ADL.XAPIWrapper.changeConfig(conf);
+           
+            // Get statements queried by activity ID
+            var coll = new ADL.Collection();
+            var res = ADL.XAPIWrapper.getStatements({"activity":"http://adlnet.gov/event/2015/xapibootcamp/guess-the-number"});
+            coll.append(res.statements);
+            while (res.more && res.more !== ""){
+               res = ADL.XAPIWrapper.getStatements(null, res.more);
+               coll.append(res.statements);
+            }
+            // Save fstmts as a new snapshot of original statements collection and filter it by verb ID
+            var fstmts = coll.save();
+            fstmts.where('verb.id = "http://adlnet.gov/event/2015/xapibootcamp/verb/ended"')
+
+            // Append the number of total queried statements and number of filtered statements
+            $("#wherediv").append("Number of statements queried just by activity id: " + coll.contents.length + "<br>");
+            $("#wherediv").append("Number of statements after filtering by ended verb id: " + fstmts.contents.length + "<br>");
+
+            // Exec button click
+            $("#execbutton").click(function() {
+                // Make sure it only happens once
+                if ($("#execdiv").is(':empty')){
+                    // Exec acts as a callback function on the query
+                    fstmts.exec(function(data){
+                        // Use jQuery each to loop through each statement
+                        $.each(data, function(i, v){
+                            // Get the name from the statement
+                            var name = v.actor.account.name;
+                            if (name == "<change this>"){
+                                name = "Anon";
+                            }
+                            // Write a human readable sentence for the statement about when the game ended
+                            $("#execdiv").append(name + " ended the game at " + 
+                                ADL.dateFromISOString(v.result.extensions["http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/endedAt"]) + "<br>");                            
+                        });
+                    });
+                }
+            });
+
+            // Sum button click
+            $("#sumbutton").click(function() {
+                // Make sure it only happens once
+                if ($("#sumdiv").is(':empty')){
+                    // Save a duplicate collection from snapshot again
+                    var dup = fstmts.save();
+                    // Use sum function of collection to get sum of all guesses
+                    var sum = dup.sum('result.extensions[http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/guesses].length');
+                    // Append all number of guesses to html
+                    $("#sumdiv").append(sum.contents[0].sum);
+                }
+            });
+
+            // Sum/Average button click
+            $("#sabutton").click(function() {
+                // Make sure it only happens once
+                if ($("#sadiv").is(':empty')){
+                    // Save a duplicate collection from snapshot again
+                    var totalDup = fstmts.save();
+                    // Use average function of collection to get average number of guesses from all games
+                    var totalAvg = totalDup.average('result.extensions[http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/guesses].length');
+                    // Use sum function of collection to get sum of all guesses
+                    var totalSum = totalDup.sum('result.extensions[http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/guesses].length');
+                    // Total number of games can be calculated from avg object's contents' data length
+                    var totalGameAttempts = totalAvg.contents[0].data.length;
+                    // Avg and sum objects contain our answers in their contents fields
+                    var totalAverage = totalAvg.contents[0].average;
+                    var totalGuesses = totalSum.contents[0].sum;
+                    // Append the total number of game attempts, guesses and average guesses to html
+                    $("#sadiv").append("Total guesses from last " + totalGameAttempts + " games: " + totalGuesses + "<br>");
+                    $("#sadiv").append("Average guesses per game: " + totalAverage.toFixed(2) + "<br>");
+                }
+            });
+
+            // Sum/Average per user button click
+            $("#userbutton").click(function(){
+                // Make sure it only happens once
+                if($("#userdiv").is(':empty')){
+                    // Save a duplicate collection from snapshot again
+                    var userGuessesDup = fstmts.save();
+                    // Use groupBy, sum, and average to calculate all data inside a single collection
+                    var guessesPerUser = userGuessesDup.groupBy('actor.account.name').sum('result.extensions[http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/guesses].length')
+                        .average('result.extensions[http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/guesses].length');
+                    // Iterate through each collection object
+                    $.each(guessesPerUser.contents, function(i,v){
+                        // Get the name (group attribute since it was grouped by the name)
+                        var name = v.group;
+                        if (v.group == "<change this>"){
+                            name = "Anon";
+                        }
+                        // Create divs for gathered information and append to html
+                        var userTotalDiv = $("<div>").html("Total guesses from " + name + "'s " + v.data.length + " games: " + v.sum + "<br>");    
+                        var userAvgDiv = $("<div>").html("Average guesses from " + name + " per game: " + v.average.toFixed(2) + "<br><br>");
+                        $("#userdiv").append(userTotalDiv);
+                        $("#userdiv").append(userAvgDiv);
+                    });
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h3>Filter statements by verb ID</h3>
+    <div id="wherediv"></div>
+    <br>
+    <br>
+    <h3>Show what time each game ended by using exec</h3>
+    <div id="execdiv"></div>
+    <br>
+    <button type="button" id="execbutton">Show Exec</button>
+    <br>
+    <br>
+    <h3>Show total number of guesses by everyone by using sum</h3>
+    <div id="sumdiv"></div>
+    <br>
+    <button type="button" id="sumbutton">Show Sum</button>
+    <br>
+    <br>
+    <h3>Calculate average number of guesses for each all games using sum and average</h3>
+    <div id="sadiv"></div>
+    <br>
+    <button type="button" id="sabutton">Show Sum/Average</button>
+    <br>
+    <br>
+    <h3>Show total number of guesses per user and calculate average number of guess per user</h3>
+    <div id="userdiv"></div>
+    <br>
+    <button type="button" id="userbutton">Show User Sum/Average</button>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+<head>
+    <script type="text/javascript" src="xAPI-Dashboard-development/lib/xapiwrapper.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Set xAPI endpoint
+            var conf = {"endpoint":"https://lrs.adlnet.gov/xapi/", "auth":"Basic " + toBase64('tom:1234')};
+            ADL.XAPIWrapper.changeConfig(conf);
+           
+            // Get statements queried by activity ID
+            var stmts = []
+            var res = ADL.XAPIWrapper.getStatements({"activity":"http://adlnet.gov/event/2015/xapibootcamp/guess-the-number"});
+            stmts = stmts.concat(res.statements);
+            while (res.more && res.more !== ""){
+               res = ADL.XAPIWrapper.getStatements(null, res.more);
+               stmts = stmts.concat(res.statements);
+            }
+
+            // Filter statements by verb ID
+            var fstmts = stmts.filter(function(v){
+                if (v.verb.id == "http://adlnet.gov/event/2015/xapibootcamp/verb/ended"){
+                    return true;
+                }
+                return false;
+            });
+
+            // Append the number of total queried statements and number of filtered statements
+            $("#filterdiv").append("Number of statements queried just by activity id: " + stmts.length + "<br>");
+            $("#filterdiv").append("Number of statements after filtering by ended verb id: " + fstmts.length + "<br>");
+
+            // Map button click
+            $("#mapbutton").click(function() {
+                // Make sure it only happens once
+                if ($("#mapdiv").is(':empty')){
+                    // Map iterates through each statement in the filtered statement list
+                    var names = fstmts.map(function(st){
+                        // Get the name from the statement
+                        var name = st.actor.account.name;
+                        if (name == "<change this>"){
+                            name = "Anon";
+                        }
+                        // Write a human readable sentence for the statement about when the game ended
+                        $("#mapdiv").append(name + " ended the game at " + 
+                            ADL.dateFromISOString(st.result.extensions["http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/endedAt"]) + "<br>");
+                    });
+                }
+            });
+
+            // Reduce button click
+            $("#reducebutton").click(function() {
+                // Make sure it only happens once
+                if ($("#reducediv").is(':empty')){
+                    // Reduce starts on the second value in the array (current value), and iterates through the array so there is always a
+                    // previous value and current value
+                    var flatArr = fstmts.reduce(function(pv, cv){
+                        // Since reduce is really meant for arrays only, retrieve the guesses array in extensions in the object
+                        if (pv.constructor === Object){
+                            pv = pv.result.extensions["http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/guesses"];
+                        }
+                        if (cv.constructor === Object){
+                            cv = cv.result.extensions["http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/guesses"];
+                        }
+                        return pv.concat(cv);
+                        // Dummy result object to be initial previous value
+                    }, {"result":{"extensions":{"http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/guesses":[]}}});
+                    // Append length of all guesses to html
+                    $("#reducediv").append(flatArr.length);
+                }
+            });
+
+            // Map and reduce button click
+            $("#mrbutton").click(function() {
+                // Make sure it only happens once
+                if ($("#mrdiv").is(':empty')){
+                    // Number of total game attempts will be the number of filtered statements
+                    var gameAttempts = fstmts.length;
+                    // Create holder array and perform map on filtered statements. It will push each guesses array into one big array 
+                    var holderArr = [];
+                    fstmts.map(function(st){
+                        holderArr.push(st.result.extensions["http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/guesses"])
+                    });
+                    // Flatten the array of arrays into one so we can get a count of total guesses from all users
+                    var totalGuessesArr = holderArr.reduce(function(pv, cv){
+                        return cv.concat(pv);
+                    });
+                    var guesses = totalGuessesArr.length;
+                    // Append the total number of game attempts and guesses to html
+                    $("#mrdiv").append("Total guesses from " + gameAttempts + " games: " + guesses + "<br>");
+                    // Calculate average guesses per game and append to html
+                    $("#mrdiv").append("Average guesses per game: " + (guesses/gameAttempts).toFixed(2) + "<br>");
+                }
+            });
+
+            $("#userbutton").click(function(){
+                if ($("#userdiv").is(':empty')){
+                    // Create array to hold all the names of users who have played the game
+                    nameArr = [];
+                    // Iterate through all filtered statements and if the name doesn't exist in the name array, add it
+                    var names = fstmts.map(function(st){
+                        var name = st.actor.account.name;
+                        if (name == "<change this>"){
+                            name = "Anon";
+                        }
+                        if (nameArr.indexOf(name) == -1){
+                            nameArr.push(name);
+                        }
+                    });
+                    // Loop through each name in the name array
+                    $.each(nameArr, function(i, v){
+                        // Create userStmts array by filtering all statements on the current name in the name list
+                        var userStmts = fstmts.filter(function(st){
+                            if (st.actor.account.name == v){
+                                return true;
+                            }
+                            else if (st.actor.account.name == "<change this>" && v == "Anon"){
+                                return true;
+                            }
+                            return false;
+                        });
+                        // Get number of games the user has played
+                        var userGameAttempts = userStmts.length;
+                        // Create userGuessesHolder array to hold array guesses from each statement by the user
+                        var userGuessesHolder = [];
+                        userStmts.map(function(st){
+                            userGuessesHolder.push(st.result.extensions["http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/guesses"])
+                        });
+                        // Flatten the array of arrays into one so we can get a count on the user's guesses
+                        var userTotalGuessesArr = userGuessesHolder.reduce(function(pv, cv){
+                            return cv.concat(pv);
+                        });
+                        var userGuesses = userTotalGuessesArr.length;
+
+                        // Create a total guess div and average guess div for each user and append it to the user parent
+                        var totalDiv = $("<div>").html("Total guesses from " + v + "'s " + userGameAttempts + " games: " + userGuesses + "<br>");
+                        var avgDiv = $("<div>").html(v + "'s average guesses per game: " + (userGuesses/userGameAttempts).toFixed(2) + "<br><br>");
+                        $("#userdiv").append(totalDiv);
+                        $("#userdiv").append(avgDiv);
+                    });
+                }
+            });
+        });
+
+    </script>
+</head>
+<body>
+    <h3>Filter statements by verb ID</h3>
+    <div id="filterdiv"></div>
+    <br>
+    <br>
+    <h3>Show what time each game ended by using map</h3>
+    <div id="mapdiv"></div>
+    <br>
+    <button type="button" id="mapbutton">Show Map</button>
+    <br>
+    <br>
+    <h3>Show total number of guesses by everyone by using reduce</h3>
+    <div id="reducediv"></div>
+    <br>
+    <button type="button" id="reducebutton">Show Reduce</button>
+    <br>
+    <br>
+    <h3>Calculate average number of guesses for each all games using map and reduce</h3>
+    <div id="mrdiv"></div>
+    <br>
+    <button type="button" id="mrbutton">Show Map/Reduce</button>
+    <br>
+    <br>
+    <h3>Show total number of guesses per user and calculate average number of guess per user</h3>
+    <div id="userdiv"></div>
+    <br>
+    <button type="button" id="userbutton">Show User Sum/Average</button>
+</body>
+</html>

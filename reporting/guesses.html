@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="nvd3/build/nv.d3.min.css"></link>
+    <link rel="stylesheet" href="styles.css"></link>
+    <script src="d3/d3.min.js" charset="utf-8"></script>
+    <script src="nvd3/build/nv.d3.min.js"></script>
+    <script src="xAPI-Dashboard-development/lib/xapiwrapper.min.js"></script>
+
+	<script type="text/javascript" src="xAPI-Dashboard-development/src/chart.js"></script>
+	<script type="text/javascript" src="xAPI-Dashboard-development/src/dashboard.js"></script>
+	<script type="text/javascript" src="xAPI-Dashboard-development/src/xapicollection.js"></script>
+    
+</head>
+<body>
+    <div class="row">
+        <div class="graphcontainer">
+            <div class="shadow bar">
+                <svg id="chart1"></svg>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="graphcontainer">
+            <div class="shadow bar">
+                <svg id="chart2"></svg>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="graphcontainer">
+            <div class="shadow bar">
+                <svg id="chart3"></svg>
+            </div>
+        </div>
+    </div>
+<script>
+    var wrapper = ADL.XAPIWrapper;
+    wrapper.changeConfig({endpoint:"https://lrs.adlnet.gov/xapi/"});
+    var dash = new ADL.XAPIDashboard();
+    dash.fetchAllStatements(
+            {'activity':'http://adlnet.gov/event/2015/xapibootcamp/guess-the-number',
+             'verb':"http://adlnet.gov/event/2015/xapibootcamp/verb/ended"
+            },
+            function() {drawCharts();}
+    );
+    
+    function drawCharts() {
+        d3.select('svg').empty();
+        graphActors();
+    }
+    
+    function graphActors() {
+        var actors = dash.createBarChart({
+            container: '#chart1',
+            groupBy: 'actor.account.name',
+            aggregate: ADL.count(),
+            child: actorChart
+        });
+        actors.clear();
+        actors.draw();
+    }
+    
+    var actorChart = dash.createBarChart({
+        container: "#chart2",
+        groupBy: 'timestamp',
+        process: function (data, event, opts) {
+            var d = data.contents.map(function(cur, idx, arr) {
+                if (cur.actor.account && cur.actor.account.name == event.in) 
+                   return cur;
+            }).filter(function(n){ return n != undefined });
+            opts.cb( d.map(function(node) {
+                return {
+                    in: node.timestamp, 
+                    out: node.result.extensions['http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/guesses'].length, 
+                    stmt: node
+                };
+            }) );
+        },
+        aggregate: ADL.count(),
+        customize: function (chart) {
+            chart.xAxis.rotateLabels(45);
+            chart.xAxis.tickFormat(function(d){
+                return new Date(d).toLocaleString()});
+        },
+        click: function(e){
+            guesses(e);
+        }
+    });
+    
+    var guesses = (function(event) {
+        var chart = nv.models.lineChart()
+            .useInteractiveGuideline(true)
+            .x(function(d) { return d[0] })
+            .y(function(d) { return d[1] })
+            .color(d3.scale.category10().range())
+            .duration(300)
+            .clipVoronoi(false)
+            .interpolate("cardinal")
+        ;
+        d3.select('#chart3')
+            .datum(formatData(event.data))
+            .call(chart);
+        nv.utils.windowResize(chart.update);
+
+        return chart;
+    });
+    
+    function formatData(data) {
+        var ret = [{key: "guesses", values: []},{key: "answer", values: []}],
+            gs = data.stmt.result.extensions['http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/guesses'],
+            ans = data.stmt.result.extensions['http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/number'];
+        
+        for (var i = 0; i < gs.length; i++) {
+            ret[0].values.push([i, gs[i]]);
+            ret[1].values.push([i, ans]);
+        }
+        return ret;
+    }
+</script>
+</body>
+</html>

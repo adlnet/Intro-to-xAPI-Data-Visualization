@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Reporting Demo</title>
+
+        <!-- jquery to support bootstrap and for general dom manipulation -->
+        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="xAPI-Dashboard-development/lib/nv.d3.css"></link>
+        <link rel="stylesheet" href="styles.css">
+        <script type="text/javascript" src="xAPI-Dashboard-development/dist/xapidashboard.min.js"></script>
+        <script type="text/javascript" src="xAPI-Dashboard-development/dist/xapicollection.min.js"></script>
+        <script>
+            ADL.XAPIWrapper.changeConfig({"endpoint" : 'https://lrs.adlnet.gov/xAPI/', user: 'tom', password: '1234'});
+            var dash = new ADL.XAPIDashboard();
+            var dash2 = new ADL.XAPIDashboard();
+
+            window.onload = function(){
+                // get all statements made in the last 15 days
+//                var query = {'since': new Date(Date.now() - 1000*60*60*24*15).toISOString()};
+//                dash.fetchAllStatements(query, fetchDoneCallback);
+                var query = {'verb': 'http://adlnet.gov/event/2015/xapibootcamp/verb/ended'};
+                dash.fetchAllStatements(query, fetchDoneCallback);
+            };
+            
+            function fetchDoneCallback(){
+                var chart = dash.createBarChart({
+                    container: '#targetnum',
+                    groupBy: 'result.extensions[http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/number]',
+                    aggregate: ADL.count(),
+                    customize: function(chart){
+                        chart.xAxis.rotateLabels(45);
+                        chart.xAxis.tickFormat(function(d){ return /[^\/]+$/.exec(d)[0]; });
+                    }
+                });
+                chart.draw();
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Target Number Frequency</h2>
+            <div id="graphContainer">
+               <div class="shadow bar" style="width: 1250px">
+                    <svg id="targetnum" style="width: 1200px"></svg>
+               </div>
+            </div>
+        </div>
+    </body>
+</html>
