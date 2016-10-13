@@ -19,7 +19,7 @@
             <div class="shadow bar">
                 <svg id="chart1"></svg>
             </div>
-        </div>
+        </div>       
     </div>
     <div class="row">
         <div class="graphcontainer">
@@ -35,6 +35,14 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="graphcontainer">
+            <div class="shadow bar">
+                <svg id="chart4"></svg>
+            </div>
+        </div>         
+    </div>
+
 <script>
     var wrapper = ADL.XAPIWrapper;
     wrapper.changeConfig({endpoint:"https://lrs.adlnet.gov/xapi/"});
@@ -49,10 +57,11 @@
     function drawCharts() {
         d3.select('svg').empty();
         graphActors();
+        graphLeaders();
     }
     
     function graphActors() {
-        var actors = dash.createBarChart({
+        var actors = dash.createPieChart({
             container: '#chart1',
             groupBy: 'actor.account.name',
             aggregate: ADL.count(),
@@ -62,6 +71,26 @@
         actors.draw();
     }
     
+    function graphLeaders(){
+        var leaders = dash.createBarChart({
+            pre: function (data, event){
+               data.contents.map(function(stmt) {
+                    stmt['result']['extensions']['totalGuesses'] = stmt.result.extensions['http://adlnet.gov/event/2015/xapibootcamp/guess-the-number/ext/guesses'].length;
+                    return stmt
+                });                
+            },
+            container: "#chart4",
+            groupBy: 'actor.account.name',
+            aggregate: ADL.min('result.extensions.totalGuesses'),
+            post: function(data) {
+                data.orderBy('out')
+                    .slice(0, 10);
+            }
+        });       
+        leaders.clear();
+        leaders.draw();
+    }
+
     var actorChart = dash.createBarChart({
         container: "#chart2",
         groupBy: 'timestamp',
