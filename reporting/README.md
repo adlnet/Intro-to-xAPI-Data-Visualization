@@ -10,27 +10,23 @@ This small tutorial will teach you how to utilize the xAPI Dashboard to generate
   6.  create child graphs to break the data down even further
 
 ## Step 1 - Include the xAPI Dashboard scripts in guesses.html  
-The first step is to download the xAPI Dashboard files. The easiest way is to download the minified version on GitHub.  
-  1.  Download the latest [xAPI Dashboard release](https://github.com/adlnet/xAPI-Dashboard/releases/tag/v1.2.2)
-  2.  Save the entire folder in the reporting folder
-  3.  Add a `<script>` tag in the `<head>` of `guesses.html` to include the necessary scripts.
+The first step is to include the xAPI Dashboard files.  
+  1.  Add a `<script>` tag in the `<head>` of `guesses.html` to include the necessary scripts.
   ``` html
   ...
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
-	<script type="text/javascript" src="xAPI-Dashboard-1.2.2/src/chart.js"></script>
+	<script type="text/javascript" src="xAPI-Dashboard-development/src/chart.js"></script>
 
-	<script type="text/javascript" src="xAPI-Dashboard-1.2.2/src/dashboard.js"></script>
+	<script type="text/javascript" src="xAPI-Dashboard-development/src/dashboard.js"></script>
 
-	<script type="text/javascript" src="xAPI-Dashboard-1.2.2/src/xapicollection.js"></script>
+	<script type="text/javascript" src="xAPI-Dashboard-development/src/xapicollection.js"></script>
   ...	
   ```
 
 ## Step 2 - Include the xAPI Wrapper in guesses.html  
-The second step is to download the xAPI Wrapper file. The easiest way is to download the minified version on GitHub.  
-  1.  Download the latest [xapiwrapper.min.js release](https://github.com/adlnet/xAPIWrapper/releases/tag/v1.5.0)
-  2.  Save `xapiwrapper.min.js` in the reporting folder with `guesses.html` (You can save it anywhere you wish, just change the source link accordingly)
-  3.  Add a `<script>` tag in the `<head>` of `guesses.html` to include the xAPI Wrapper.
+The second step is to include the xAPI Wrapper file.
+  1.  Add a `<script>` tag in the `<head>` of `guesses.html` to include the xAPI Wrapper.
   ``` html
   ...
     <script src="nvd3/build/nv.d3.min.js"></script>
@@ -89,8 +85,6 @@ do the handshake with xAPI Launch and pass a configured object to the callback.
             },
             function() {drawCharts();}
     );
-            function() {drawCharts();}
-    );
     ```
   ## Step 5 - Create our charts
   The drawCharts callback gets called automatically after we fetch our statements. This function simply clears our first graph container then calls the graphActors function which just lists everyone who has played the guess a number game and how many times they've played.
@@ -99,7 +93,7 @@ do the handshake with xAPI Launch and pass a configured object to the callback.
     ...
           $('#endpoint').text(ADL.XAPIWrapper.lrs.endpoint);
 	  }, true);
-	  
+
 	  function drawCharts() {
 	    // clears first svg container
 	    d3.select('svg').empty();
