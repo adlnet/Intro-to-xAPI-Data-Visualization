@@ -11,7 +11,7 @@ This small tutorial will teach you how to utilize the xAPI Dashboard to generate
 
 ## Step 1 - Include the xAPI Dashboard scripts in guesses.html  
 The first step is to include the xAPI Dashboard files.  
-  1.  Add a `<script>` tag in the `<head>` of `guesses.html` to include the necessary scripts.
+1.  Add a `<script>` tag in the `<head>` of `guesses.html` to include the necessary scripts.
   ``` html
   ...
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
@@ -23,7 +23,7 @@ The first step is to include the xAPI Dashboard files.
 
 ## Step 2 - Include the xAPI Wrapper in guesses.html  
 The second step is to include the xAPI Wrapper file.
-  1.  Add a `<script>` tag in the `<head>` of `guesses.html` to include the xAPI Wrapper.
+1.  Add a `<script>` tag in the `<head>` of `guesses.html` to include the xAPI Wrapper.
   ``` html
   ...
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>  
