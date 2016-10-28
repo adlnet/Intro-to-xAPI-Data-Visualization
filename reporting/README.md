@@ -54,21 +54,18 @@ do the handshake with xAPI Launch and pass a configured object to the callback. 
   ``` 
 
 ## Step 4 - Create a dashboard
-  Next we have to initilize our dashboard. After we initilize it, we are able to provide LRS statement API [parameters](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#213-get-statements) to perform a query to the LRS. We'll also create our baseURI.
-    1. Create an xAPI Dashboard object just above the launch callback:
-    ```javascript
-    ...
-    var dash = new ADL.XAPIDashboard();
-    var baseURI = "";
-    ADL.launch(function(err, launchdata, xAPIWrapper) {
-        if (!err) {    
-    ...
+Next we have to initilize our dashboard. After we initilize it, we are able to provide LRS statement API [parameters](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#213-get-statements) to perform a query to the LRS. We'll also create our baseURI.
+1. Create an xAPI Dashboard object just above the launch callback:
+	```javascript
+	...
+	var dash = new ADL.XAPIDashboard();
+	var baseURI = "";
+	ADL.launch(function(err, launchdata, xAPIWrapper) {
+	    if (!err) {    
+	...
     ```
 
-    2. xAPI Launch sends information (launch data) to the content, which the ADL.launch function sends to the callback. The
-  launchdata.customData object contains content that can be configured in the
-  xAPI Launch server, allowing us to enter a base URI we can use for all places
-  that need a URI. Using that URI we can provide query parameters to fetch statements. If not using launch we can set our endpoint manually and hardcode the baseURI:
+2. xAPI Launch sends information (launch data) to the content, which the ADL.launch function sends to the callback. The launchdata.customData object contains content that can be configured in the xAPI Launch server, allowing us to enter a base URI we can use for all places that need a URI. Using that URI we can provide query parameters to fetch statements. If not using launch we can set our endpoint manually and hardcode the baseURI:
     ```javascript
 	...
     if (!err) {
@@ -99,7 +96,7 @@ do the handshake with xAPI Launch and pass a configured object to the callback. 
 
 ## Step 5 - Create our charts
 The drawCharts callback gets called automatically after we fetch our statements. This function simply clears our first graph container then calls the graphActors function which just lists everyone who has played the guess a number game and how many times they've played.
-	1. Use the createBarChart function of the dash to get started:
+1. Use the createBarChart function of the dash to get started:
 	```javascript
 	...
 		$('#endpoint').text(ADL.XAPIWrapper.lrs.endpoint);
@@ -118,7 +115,7 @@ The drawCharts callback gets called automatically after we fetch our statements.
 	...    
 	```
 
-	2. Supply the parameters needed to display the graph and set the x and y axes. Container tells the dashboard where to display it, groupBy acts as the x axis and aggregate acts as the y axis. Always clear the charts first in case a previous chart was rendered:
+2. Supply the parameters needed to display the graph and set the x and y axes. Container tells the dashboard where to display it, groupBy acts as the x axis and aggregate acts as the y axis. Always clear the charts first in case a previous chart was rendered:
 	```javascript
 	...
 	function graphActors() {
@@ -133,7 +130,7 @@ The drawCharts callback gets called automatically after we fetch our statements.
 	...
 	```
 
-	3. Now that we have our first graph, wouldn't it be nice to drill down into it a bit more after we click a bar? Let's add a child graph to it that displays all of the times our selected user played the game and how many guesses per game they had:
+3. Now that we have our first graph, wouldn't it be nice to drill down into it a bit more after we click a bar? Let's add a child graph to it that displays all of the times our selected user played the game and how many guesses per game they had:
 	```javascript
 	...
 	function graphActors() {
@@ -155,7 +152,7 @@ The drawCharts callback gets called automatically after we fetch our statements.
 	...
 	```
 
-	4. Notice all we can see is the first graph and nothing is appearing on the child graph yet. We need to process some data first to display what we want. The process parameter takes a function to process the data before using whatever aggregate function is supplied.
+4. Notice all we can see is the first graph and nothing is appearing on the child graph yet. We need to process some data first to display what we want. The process parameter takes a function to process the data before using whatever aggregate function is supplied.
 	```javascript
 	...
     groupBy: 'timestamp',
@@ -182,7 +179,7 @@ The drawCharts callback gets called automatically after we fetch our statements.
 	...
 	```
 
-	5. We can also customize the labels on the charts. Let's do a little customization and even add another child chart for even further insight:
+5. We can also customize the labels on the charts. Let's do a little customization and even add another child chart for even further insight:
 	```javascript
 	...
     },
@@ -198,7 +195,7 @@ The drawCharts callback gets called automatically after we fetch our statements.
 	...    
 	```
 
-	6. Now that we've used the xAPI Dashboard to create a few charts, let's try making one directrly with the d3 library. Create the guesses function to show a line graph of the actual guesses the player had:
+6. Now that we've used the xAPI Dashboard to create a few charts, let's try making one directrly with the d3 library. Create the guesses function to show a line graph of the actual guesses the player had:
 	```javascript
 	...
 	        guesses(e);
@@ -226,7 +223,7 @@ The drawCharts callback gets called automatically after we fetch our statements.
 	...
 	```
 
-	7. Almost there...we have to format the data for some rhyme or reason so let's write that function:
+7. Almost there...we have to format the data for some rhyme or reason so let's write that function:
 	```javascript
 	...
 	        return chart;
