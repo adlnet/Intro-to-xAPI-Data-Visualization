@@ -26,7 +26,7 @@ The second step is to include the xAPI Wrapper file.
 1.  Add a `<script>` tag in the `<head>` of `guesses.html` to include the xAPI Wrapper.
   ``` html
   ...
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>  
+    <script type="text/javascript" src="xAPI-Dashboard-development/src/xapicollection.js"></script>  
     <script src="./xapiwrapper.min.js"></script>    
   ...
   ```
@@ -66,26 +66,23 @@ Next we have to initilize our dashboard. After we initilize it, we are able to p
 	...
     ```
 
-2. xAPI Launch sends information (launch data) to the content, which the ADL.launch function sends to the callback. The launchdata.customData object contains content that can be configured in the xAPI Launch server, allowing us to enter a base URI we can use for all places that need a URI. Using that URI we can provide query parameters to fetch statements. If not using launch we can set our endpoint manually and hardcode the baseURI:
+2. xAPI Launch sends information (launch data) to the content, which the ADL.launch function sends to the callback. The launchdata.customData object contains content that can be configured in the xAPI Launch server, allowing us to enter a base URI we can use for all places that need a URI. Using that URI we can provide query parameters to fetch statements. If not using launch we can set our endpoint manually:
     ```javascript
 	...
     if (!err) {
         ADL.XAPIWrapper = xAPIWrapper;
-	    baseURI = launchdata.customData.content;
-	    dash.fetchAllStatements(
-	            {'activity': baseURI + '/guess-the-number',
-	             'verb': baseURI + '/verb/ended'
-	            },
-	            function() {drawCharts();}
-	    );
- 	...
-    alert("This is not being launched via xAPI Launch");
-    var conf = {
-      "endpoint" : "https://lrs.adlnet.gov/xapi/",
-      "auth" : "Basic " + toBase64('xapi-workshop:password1234'),
-    };
-    ADL.XAPIWrapper.changeConfig(conf);
-    baseURI = "http://adlnet.gov/event/xapiworkshop/non-launch";
+        baseURI = launchdata.customData.content;
+        console.log("--- content launched via xAPI Launch ---\n", ADL.XAPIWrapper.lrs, "\n", launchdata);
+    } else {
+        alert("This is not being launched via xAPI Launch");
+        ADL.XAPIWrapper.changeConfig({
+            "endpoint":"https://lrs.adlnet.gov/xapi/",
+            "user":"xapi-workshop",
+            "password":"password1234"
+        });
+        baseURI = "http://adlnet.gov/event/xapiworkshop/non-launch";
+        console.log("--- content not launched via xAPI Launch ---\n", ADL.XAPIWrapper.lrs);
+    }
     dash.fetchAllStatements(
             {'activity': baseURI + '/guess-the-number',
              'verb': baseURI + '/verb/ended'
@@ -123,7 +120,7 @@ The drawCharts callback gets called automatically after we fetch our statements.
 	function graphActors() {
 	    var actors = dash.createBarChart({
 	        container: '#chart1',
-	        groupBy: 'actor.account.name',
+	        groupBy: 'actor.name',
 	        aggregate: ADL.count(),
 	    });
 	    actors.clear();
@@ -135,16 +132,16 @@ The drawCharts callback gets called automatically after we fetch our statements.
 3. Now that we have our first graph, wouldn't it be nice to drill down into it a bit more after we click a bar? Let's add a child graph to it that displays all of the times our selected user played the game and how many guesses per game they had:
 	```javascript
 	...
-	function graphActors() {
-	    var actors = dash.createBarChart({
-	        container: '#chart1',
-	        groupBy: 'actor.account.name',
-	        aggregate: ADL.count(),
-	        child: actorChart
-	    });
-	    actors.clear();
-	    actors.draw();
-	}
+    function graphActors() {
+        var actors = dash.createBarChart({
+            container: '#chart1',
+            groupBy: 'actor.account.name',
+            aggregate: ADL.count(),
+            child: actorChart
+        });
+        actors.clear();
+        actors.draw();
+    }
 
 	var actorChart = dash.createBarChart({
 	    container: "#chart2",
@@ -154,7 +151,7 @@ The drawCharts callback gets called automatically after we fetch our statements.
 	...
 	```
 
-4. Notice all we can see is the first graph and nothing is appearing on the child graph yet. We need to process some data first to display what we want. The process parameter takes a function to process the data before using whatever aggregate function is supplied.
+4. Notice in the child chart we just see the count of the times tried at that time (which will always be 1). This isn't very helpful so we need to process some data first to display the number of guesses for each time. The process parameter takes a function to process the data before using whatever aggregate function is supplied:
 	```javascript
 	...
     groupBy: 'timestamp',
@@ -164,20 +161,20 @@ The drawCharts callback gets called automatically after we fetch our statements.
         // data is the name of the actor clicked. We only want to return his data
         // and only if it's not undefined
         var d = data.contents.map(function(cur, idx, arr) {
-            if (cur.actor.account && cur.actor.account.name == event.in) 
+            if (cur.actor.account && cur.actor.account.name == event.in)
                return cur;
         }).filter(function(n){ return n != undefined });
-        // opts callback is always needed with process. in value is the label for 
+        // opts callback is always needed with process. in value is the label for
         // the out value (y-axis)
         opts.cb( d.map(function(node) {
             return {
-                in: node.timestamp, 
-                out: node.result.extensions[baseURI + '/guess-the-number/ext/guesses'].length, 
+                in: node.timestamp,
+                out: node.result.extensions[baseURI + '/guess-the-number/ext/guesses'].length,
                 stmt: node
             };
         }) );
     },
-    aggregate: ADL.count(),    
+    aggregate: ADL.count(),   
 	...
 	```
 
@@ -197,50 +194,48 @@ The drawCharts callback gets called automatically after we fetch our statements.
 	...    
 	```
 
-6. Now that we've used the xAPI Dashboard to create a few charts, let's try making one directrly with the d3 library. Create the guesses function to show a line graph of the actual guesses the player had:
+6. Now that we've used the xAPI Dashboard to create a few charts, let's try making one directly with the [d3](http://d3js.org/) library. Create the guesses function to show a line graph of the actual guesses the player had:
 	```javascript
 	...
 	        guesses(e);
 	    }
 	});
-	var guesses = (function(event) {
-		// call the nv library and style it
-	    var chart = nv.models.lineChart()
-	        .useInteractiveGuideline(true)
-	        .x(function(d) { return d[0] })
-	        .y(function(d) { return d[1] })
-	        .color(d3.scale.category10().range())
-	        .duration(300)
-	        .clipVoronoi(false)
-	        .interpolate("cardinal")
-	    ;
-	    // call d3 to populate chart with data
-	    d3.select('#chart3')
-	        .datum(formatData(event.data))
-	        .call(chart);
-	    nv.utils.windowResize(chart.update);
-
-	    return chart;
-	});    
+    var guesses = (function(event) {
+        // call the nv library and style it
+        var chart = nv.models.lineChart()
+            .useInteractiveGuideline(true)
+            .x(function(d) { return d[0] })
+            .y(function(d) { return d[1] })
+            .color(d3.scale.category10().range())
+            .duration(300)
+            .clipVoronoi(false)
+            .interpolate("cardinal")
+        ;
+        // call d3 to populate chart with data
+        d3.select('#chart3')
+            .datum(formatData(event.data))
+            .call(chart);
+        nv.utils.windowResize(chart.update);
+        return chart;
+    });    
 	...
 	```
 
-7. Almost there...we have to format the data for some rhyme or reason so let's write that function:
+7. Almost there! Now we to change the statement data into a format the chart libary can use:
 	```javascript
 	...
-	        return chart;
+        return chart;
     });
 
-	function formatData(data) {
-	    var ret = [{key: "guesses", values: []},{key: "answer", values: []}],
-	        gs = data.stmt.result.extensions[baseURI + '/guess-the-number/ext/guesses'],
-	        ans = data.stmt.result.extensions[baseURI + '/guess-the-number/ext/number'];
-	    
-	    for (var i = 0; i < gs.length; i++) {
-	        ret[0].values.push([i, gs[i]]);
-	        ret[1].values.push([i, ans]);
-	    }
-	    return ret;
-	}  
+    function formatData(data) {
+        var ret = [{key: "guess", values: []},{key: "answer", values: []}],
+            gs = data.stmt.result.extensions[baseURI + '/guess-the-number/ext/guesses'],
+            ans = data.stmt.result.extensions[baseURI + '/guess-the-number/ext/number'];
+        for (var i = 0; i < gs.length; i++) {
+            ret[0].values.push([i+1, gs[i]]);
+            ret[1].values.push([i+1, ans]);
+        }
+        return ret;
+    }
 	...  
 	```
