@@ -120,7 +120,7 @@ The drawCharts callback gets called automatically after we fetch our statements.
 	function graphActors() {
 	    var actors = dash.createBarChart({
 	        container: '#chart1',
-	        groupBy: 'actor.name',
+	        groupBy: 'actor.account.name',
 	        aggregate: ADL.count(),
 	    });
 	    actors.clear();
