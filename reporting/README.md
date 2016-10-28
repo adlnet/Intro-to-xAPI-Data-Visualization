@@ -120,7 +120,7 @@ The drawCharts callback gets called automatically after we fetch our statements.
 	function graphActors() {
 	    var actors = dash.createBarChart({
 	        container: '#chart1',
-	        groupBy: 'actor.account.name',
+	        groupBy: 'actor.name',
 	        aggregate: ADL.count(),
 	    });
 	    actors.clear();
@@ -135,7 +135,7 @@ The drawCharts callback gets called automatically after we fetch our statements.
     function graphActors() {
         var actors = dash.createBarChart({
             container: '#chart1',
-            groupBy: 'actor.account.name',
+            groupBy: 'actor.name',
             aggregate: ADL.count(),
             child: actorChart
         });
@@ -161,7 +161,7 @@ The drawCharts callback gets called automatically after we fetch our statements.
         // data is the name of the actor clicked. We only want to return his data
         // and only if it's not undefined
         var d = data.contents.map(function(cur, idx, arr) {
-            if (cur.actor.account && cur.actor.account.name == event.in)
+            if (cur.actor && cur.actor.name == event.in)
                return cur;
         }).filter(function(n){ return n != undefined });
         // opts callback is always needed with process. in value is the label for

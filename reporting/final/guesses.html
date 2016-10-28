@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="nvd3/build/nv.d3.min.css"></link>
+    <link rel="stylesheet" href="styles.css"></link>
+    <script src="d3/d3.min.js" charset="utf-8"></script>
+    <script src="nvd3/build/nv.d3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="xAPI-Dashboard-development/src/chart.js"></script>
+    <script type="text/javascript" src="xAPI-Dashboard-development/src/dashboard.js"></script>
+    <script type="text/javascript" src="xAPI-Dashboard-development/src/xapicollection.js"></script>
+    <script src="./xapiwrapper.min.js"></script>
+</head>
+<body>
+    <div class="row">
+        <div class="graphcontainer">
+            <div class="shadow bar">
+                <svg id="chart1"></svg>
+            </div>
+        </div>       
+    </div>
+    <div class="row">
+        <div class="graphcontainer">
+            <div class="shadow bar">
+                <svg id="chart2"></svg>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="graphcontainer">
+            <div class="shadow bar">
+                <svg id="chart3"></svg>
+            </div>
+        </div>
+    </div>
+<div id="endpoint"></div>
+<script>
+    var dash = new ADL.XAPIDashboard();
+    var baseURI = "";
+    ADL.launch(function(err, launchdata, xAPIWrapper) {
+        if (!err) {
+            ADL.XAPIWrapper = xAPIWrapper;
+            baseURI = launchdata.customData.content;
+            console.log("--- content launched via xAPI Launch ---\n", ADL.XAPIWrapper.lrs, "\n", launchdata);
+        } else {
+            alert("This is not being launched via xAPI Launch");
+            ADL.XAPIWrapper.changeConfig({
+                "endpoint":"https://lrs.adlnet.gov/xapi/",
+                "user":"xapi-workshop",
+                "password":"password1234"
+            });
+            baseURI = "http://adlnet.gov/event/xapiworkshop/non-launch";
+            console.log("--- content not launched via xAPI Launch ---\n", ADL.XAPIWrapper.lrs);
+        }
+        dash.fetchAllStatements(
+                {'activity': baseURI + '/guess-the-number',
+                 'verb': baseURI + '/verb/ended'
+                },
+                function() {drawCharts();}
+        );
+        $('#endpoint').text(ADL.XAPIWrapper.lrs.endpoint);
+    }, true);
+    function drawCharts() {
+        // clears first svg container
+        d3.select('svg').empty();
+        graphActors();
+    }
+    function graphActors() {
+        var actors = dash.createBarChart({
+            container: '#chart1',
+            groupBy: 'actor.name',
+            aggregate: ADL.count(),
+            child: actorChart
+        });
+        actors.clear();
+        actors.draw();
+    }
+    var actorChart = dash.createBarChart({
+        container: "#chart2",
+        groupBy: 'timestamp',
+        process: function (data, event, opts) {
+            // the map/filter functions make sure no funny statements were collected
+            // and ensure all actors have an account and accound name. The event.in
+            // data is the name of the actor clicked. We only want to return his data
+            // and only if it's not undefined
+            var d = data.contents.map(function(cur, idx, arr) {
+                if (cur.actor && cur.actor.name == event.in)
+                   return cur;
+            }).filter(function(n){ return n != undefined });
+            // opts callback is always needed with process. in value is the label for
+            // the out value (y-axis)
+            opts.cb( d.map(function(node) {
+                return {
+                    in: node.timestamp,
+                    out: node.result.extensions[baseURI + '/guess-the-number/ext/guesses'].length,
+                    stmt: node
+                };
+            }) );
+        },
+        aggregate: ADL.count(),
+        customize: function (chart) {
+            chart.xAxis.rotateLabels(45);
+            chart.xAxis.tickFormat(function(d){
+                return new Date(d).toLocaleString()});
+        },
+        click: function(e){
+            guesses(e);
+        }
+    });
+    var guesses = (function(event) {
+        // call the nv library and style it
+        var chart = nv.models.lineChart()
+            .useInteractiveGuideline(true)
+            .x(function(d) { return d[0] })
+            .y(function(d) { return d[1] })
+            .color(d3.scale.category10().range())
+            .duration(300)
+            .clipVoronoi(false)
+            .interpolate("cardinal")
+        ;
+        // call d3 to populate chart with data
+        d3.select('#chart3')
+            .datum(formatData(event.data))
+            .call(chart);
+        nv.utils.windowResize(chart.update);
+        return chart;
+    });
+    function formatData(data) {
+        var ret = [{key: "guess", values: []},{key: "answer", values: []}],
+            gs = data.stmt.result.extensions[baseURI + '/guess-the-number/ext/guesses'],
+            ans = data.stmt.result.extensions[baseURI + '/guess-the-number/ext/number'];
+        for (var i = 0; i < gs.length; i++) {
+            ret[0].values.push([i+1, gs[i]]);
+            ret[1].values.push([i+1, ans]);
+        }
+        return ret;
+    }
+</script>
+</body>
+</html>
