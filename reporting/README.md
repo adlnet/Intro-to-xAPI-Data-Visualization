@@ -26,7 +26,7 @@ The second step is to include the xAPI Wrapper file.
 1.  Add a `<script>` tag in the `<head>` of `guesses.html` to include the xAPI Wrapper.
   ``` html
   ...
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>  
+    <script type="text/javascript" src="xAPI-Dashboard-development/src/xapicollection.js"></script>  
     <script src="./xapiwrapper.min.js"></script>    
   ...
   ```
@@ -225,7 +225,7 @@ The drawCharts callback gets called automatically after we fetch our statements.
 	...
 	```
 
-7. Almost there...we have to format the data for some rhyme or reason so let's write that function:
+7. Almost there! Now we to change the statement data into a format the chart libary can use:
 	```javascript
 	...
 	        return chart;
