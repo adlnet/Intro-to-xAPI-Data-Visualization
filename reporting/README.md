@@ -55,6 +55,7 @@ do the handshake with xAPI Launch and pass a configured object to the callback. 
 
 ## Step 4 - Create a dashboard
 Next we have to initilize our dashboard. After we initilize it, we are able to provide LRS statement API [parameters](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#213-get-statements) to perform a query to the LRS. We'll also create our baseURI.
+
 1. Create an xAPI Dashboard object just above the launch callback:
 	```javascript
 	...
