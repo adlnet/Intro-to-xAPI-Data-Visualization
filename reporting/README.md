@@ -97,6 +97,7 @@ Next we have to initilize our dashboard. After we initilize it, we are able to p
 
 ## Step 5 - Create our charts
 The drawCharts callback gets called automatically after we fetch our statements. This function simply clears our first graph container then calls the graphActors function which just lists everyone who has played the guess a number game and how many times they've played.
+
 1. Use the createBarChart function of the dash to get started:
 	```javascript
 	...
