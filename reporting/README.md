@@ -15,9 +15,9 @@ The first step is to include the xAPI Dashboard files.
   ``` html
   ...
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-	<script type="text/javascript" src="xAPI-Dashboard-development/src/chart.js"></script>
-	<script type="text/javascript" src="xAPI-Dashboard-development/src/dashboard.js"></script>
-	<script type="text/javascript" src="xAPI-Dashboard-development/src/xapicollection.js"></script>
+	<script type="text/javascript" src="libs/xAPI-Dashboard-development/src/chart.js"></script>
+	<script type="text/javascript" src="libs/xAPI-Dashboard-development/src/dashboard.js"></script>
+	<script type="text/javascript" src="libs/xAPI-Dashboard-development/src/xapicollection.js"></script>
   ...	
   ```
 
@@ -26,8 +26,8 @@ The second step is to include the xAPI Wrapper file.
 1.  Add a `<script>` tag in the `<head>` of `guesses.html` to include the xAPI Wrapper.
   ``` html
   ...
-    <script type="text/javascript" src="xAPI-Dashboard-development/src/xapicollection.js"></script>  
-    <script src="./xapiwrapper.min.js"></script>    
+    <script type="text/javascript" src="libs/xAPI-Dashboard-development/src/xapicollection.js"></script>  
+    <script src="libs/xapiwrapper.min.js"></script>    
   ...
   ```
 
@@ -243,7 +243,7 @@ The drawCharts callback gets called automatically after we fetch our statements.
 Launch doesn't require the graphs to be uploaded. This step is done as a convenience so we don't have to host our graphs on another server.  
   
 1. xAPI Launch has limited support of cmi5's package specification to allow us to package up our graphs and import on the server. The xml file is already set up, no edits are needed. 
-In the `final/` folder, zip cmi5.xml, guesses.html, d3/, nvd3/, styles.css, xAPI-Dashboard-development/, and xapiwrapper.min.js. Make sure not to zip the containing folder (reporting).  
+Copy our guesses.html file to the `packaged/` folder. In the `packaged/` folder, zip cmi5.xml, guesses.html, and libs/ together. Make sure not to zip the containing folder (reporting).  
 2. On the xAPI Launch server, login and under the Apps drop down select Upload App. Choose your zip and upload.  
 
 ## Step 7 - Configure the App  
