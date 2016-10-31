@@ -239,3 +239,18 @@ The drawCharts callback gets called automatically after we fetch our statements.
     }
 	...  
 	```
+## Step 6 - Upload the graphs  
+Launch doesn't require the graphs to be uploaded. This step is done as a convenience so we don't have to host our graphs on another server.  
+  
+1. xAPI Launch has limited support of cmi5's package specification to allow us to package up our graphs and import on the server. The xml file is already set up, no edits are needed. 
+In the `final/` folder, zip cmi5.xml, guesses.html, d3/, nvd3/, styles.css, xAPI-Dashboard-development/, and xapiwrapper.min.js. Make sure not to zip the containing folder (reporting).  
+2. On the xAPI Launch server, login and under the Apps drop down select Upload App. Choose your zip and upload.  
+
+## Step 7 - Configure the App  
+Before launching our graphs, we need to configure the launch settings to include our base URI so it can be passed to the graphs during the launch process.  
+1. Select the '...' button beside 'Launch' and choose 'Edit'.  
+2. Add `http://adlnet.gov/event/xapiworkshop/<<name>>` in the 'Custom Data' field.  
+3. Change 'Launch Type' to 'Popup'.
+
+## Step 8 - Take a look at your graphs
+Launch your graphs and look at the stats!
