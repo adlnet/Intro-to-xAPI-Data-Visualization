@@ -239,11 +239,13 @@ The drawCharts callback gets called automatically after we fetch our statements.
     }
 	...  
 	```
+	
 ## Step 6 - Upload the graphs  
 Launch doesn't require the graphs to be uploaded. This step is done as a convenience so we don't have to host our graphs on another server.  
   
 1. xAPI Launch has limited support of cmi5's package specification to allow us to package up our graphs and import on the server. The xml file is already set up, no edits are needed. 
 In the `final/` folder, zip cmi5.xml, guesses.html, d3/, nvd3/, styles.css, xAPI-Dashboard-development/, and xapiwrapper.min.js. Make sure not to zip the containing folder (reporting).  
+
 2. On the xAPI Launch server, login and under the Apps drop down select Upload App. Choose your zip and upload.  
 
 ## Step 7 - Configure the App  
