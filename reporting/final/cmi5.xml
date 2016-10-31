@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<courseStructure xmlns="https://w3id.org/xapi/profiles/cmi5/v1/CourseStructure.xsd">
+  <course id="http://course-repository.example.edu/identifiers/courses/02baafcf">
+    <title>
+      <langstring lang="en-US">Intro to xAPI Data Visualization</langstring>
+    </title>
+    <description>
+      <langstring lang="en-US">
+		This course will show how to retrieve data from an Experience API (xAPI) Learning Record Store (LRS)
+ 		and usefully display it to a user using the xAPI Dashboard to produce charts.
+      </langstring>
+    </description>
+  </course>
+  <au id="http://course-repository.example.edu/identifiers/courses/02baafcf/aus/4c07">
+    <title>
+      <langstring lang="en-US">xAPI Dashboard Charts</langstring>
+    </title>
+    <description>
+      <langstring lang="en-US">
+        These charts read data from the LRS about player who play the Guess a Number game.
+      </langstring>
+    </description>
+    <url>./guesses.html</url>
+  </au>
+</courseStructure>
