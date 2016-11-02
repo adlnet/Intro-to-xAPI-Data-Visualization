@@ -15,9 +15,9 @@ The first step is to include the xAPI Dashboard files.
   ``` html
   ...
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-	<script type="text/javascript" src="libs/xAPI-Dashboard-development/src/chart.js"></script>
-	<script type="text/javascript" src="libs/xAPI-Dashboard-development/src/dashboard.js"></script>
-	<script type="text/javascript" src="libs/xAPI-Dashboard-development/src/xapicollection.js"></script>
+	<script type="text/javascript" src="./libs/xAPI-Dashboard-development/src/chart.js"></script>
+	<script type="text/javascript" src="./libs/xAPI-Dashboard-development/src/dashboard.js"></script>
+	<script type="text/javascript" src="./libs/xAPI-Dashboard-development/src/xapicollection.js"></script>
   ...	
   ```
 
@@ -26,8 +26,8 @@ The second step is to include the xAPI Wrapper file.
 1.  Add a `<script>` tag in the `<head>` of `guesses.html` to include the xAPI Wrapper.
   ``` html
   ...
-    <script type="text/javascript" src="libs/xAPI-Dashboard-development/src/xapicollection.js"></script>  
-    <script src="libs/xapiwrapper.min.js"></script>    
+    <script type="text/javascript" src="./libs/xAPI-Dashboard-development/src/xapicollection.js"></script>  
+    <script src="./libs/xapiwrapper.min.js"></script>    
   ...
   ```
 
