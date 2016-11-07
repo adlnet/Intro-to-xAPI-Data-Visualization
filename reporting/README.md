@@ -159,7 +159,7 @@ The drawCharts callback gets called automatically after we fetch our statements.
     groupBy: 'timestamp',
     process: function (data, event, opts) {
         // the map/filter functions make sure no funny statements were collected
-        // and ensure all actors have an account and accound name. The event.in
+        // and ensure all actors have an actor and actor name. The event.in
         // data is the name of the actor clicked. We only want to return his data
         // and only if it's not undefined
         var d = data.contents.map(function(cur, idx, arr) {
