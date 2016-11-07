@@ -42,4 +42,5 @@ The following table lists the properties of a statement that can be used to quer
 
 ### authority
   >__GET Params:__ agent and related_agents
+  
   >__Example:__ /statements?agent={"mbox":"mailto:admin@example.com"}&related_agents=true
