@@ -2,13 +2,15 @@
 
 
 ## Searchable Properties in a Statement
-The following table lists the properties of a statement that can be used to query the LRS. See the xAPI spec [for more details](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md#stmtapiget).
+The following table lists the properties of a statement that can be used to query the LRS. See the xAPI spec [for more details](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#213-get-statements).
 
 ### id
   >__GET Params:__ statementId  
   >__Example:__ /statements?statementId=9847e454-6ae7-4d00-ba6b-04f209171de6  
-  
-### actor
+  >__GET Params:__ voidedStatementId  
+  >__Example:__ /statements?voidedStatementId=9847e454-6ae7-4d00-ba6b-04f209171de6  
+
+### actor/object
   >__GET Params:__ agent  
   >__Example:__ /statements?agent={"mbox":"mailto:learner@example.com"}  
 
@@ -18,15 +20,12 @@ The following table lists the properties of a statement that can be used to quer
   
 ### object <small>(when it is an Activity)</small>  
   >__GET Params:__ activity  
-  >__Example:__ /statements?activity=http://adlnet.gov/event/2015/xapibootcamp/guess-the-number  
+  >__Example:__ /statements?activity=http://adlnet.gov/event/xapiworkshop/tecom/guess-the-number  
   
-### object <small>(when it is an Agent or Group)</small>
-  >__GET Params:__ agent and related_agents  
-  >__Example:__ /statements?agent={"mbox":"mailto:learner@example.com"}&related_agents=true  
-  
-### timestamp
+### stored
   >__GET Params:__ since or until  
   >__Example:__ /statements?since=2015-07-02T11:59:19.353Z  
+  >__NOTE:__ since parameter is exclusive, until parameter is inclusive
 
 ### context properties
 #### registration
@@ -39,4 +38,8 @@ The following table lists the properties of a statement that can be used to quer
 
 #### contextActivities
   >__GET Params:__ activity and related_activities  
-  >__Example:__ /statements?activity=http://adlnet.gov/event/2015/xapibootcamp&related_activities=true  
+  >__Example:__ /statements?activity=http://adlnet.gov/event/xapibootcamp/tecom&related_activities=true  
+
+### authority
+  >__GET Params:__ agent and related_agents
+  >__Example:__ /statements?agent={"mbox":"mailto:admin@example.com"}&related_agents=true
