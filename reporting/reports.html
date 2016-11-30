@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./libs/nvd3/build/nv.d3.min.css"></link>
+    <link rel="stylesheet" href="./libs/styles.css"></link>
+    <script src="./libs/d3/d3.min.js" charset="utf-8"></script>
+    <script src="./libs/nvd3/build/nv.d3.min.js"></script>
+
+    <!-- step 1 -->
+    <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./libs/xAPI-Dashboard-development/src/chart.js"></script>
+    <script type="text/javascript" src="./libs/xAPI-Dashboard-development/src/dashboard.js"></script>
+    <script type="text/javascript" src="./libs/xAPI-Dashboard-development/src/xapicollection.js"></script>
+    -->
+    <!-- end step 1 -->
+
+    <!-- step 2 -->
+    <!-- <script src="./libs/xapiwrapper.min.js"></script> -->
+    <!-- end step 2 -->
+
+</head>
+<body>
+    <div class="row">
+        <div class="graphcontainer">
+            <div class="shadow bar">
+                <svg id="chart1"></svg>
+            </div>
+        </div>       
+    </div>
+    <div class="row">
+        <div class="graphcontainer">
+            <div class="shadow bar">
+                <svg id="chart2"></svg>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="graphcontainer">
+            <div class="shadow bar">
+                <svg id="chart3"></svg>
+            </div>
+        </div>
+    </div>
+<div id="endpoint"></div>
+<script>
+    // -- step 4 --
+    // -- step 4.1 --
+    // var dash = new ADL.XAPIDashboard();
+    // var baseURI = "";
+    // -- end step 4.1 --
+
+    // -- step 3 --
+    // ADL.launch(function(err, launchdata, xAPIWrapper) {
+    //     if (!err) {
+    //         ADL.XAPIWrapper = xAPIWrapper;
+    //         // -- step 4.2 --
+    //         // baseURI = launchdata.customData.content;
+    //         // -- end step 4.2 --
+    //         console.log("--- content launched via xAPI Launch ---\n", ADL.XAPIWrapper.lrs, "\n", launchdata);
+    //     } else {
+    //         alert("This is not being launched via xAPI Launch");
+    //         // -- step 4.2 --
+    //         // ADL.XAPIWrapper.changeConfig({
+    //         //     "endpoint":"https://lrs.adlnet.gov/xapi/",
+    //         //     "user":"xapi-workshop",
+    //         //     "password":"password1234"
+    //         // });
+    //         // baseURI = "http://adlnet.gov/event/xapiworkshop/non-launch";
+    //         // -- end step 4.2 --
+    //         console.log("--- content not launched via xAPI Launch ---\n", ADL.XAPIWrapper.lrs);
+    //     }
+    //     // -- step 4.2 --
+    //     // dash.fetchAllStatements(
+    //     //         {'activity': baseURI + '/guess-the-number',
+    //     //          'verb': baseURI + '/verb/ended'
+    //     //         },
+    //     //         function() {drawCharts();}
+    //     // );
+    //     // -- end step 4.2 --
+    //     $('#endpoint').text(ADL.XAPIWrapper.lrs.endpoint);
+    // }, true);
+    // -- end step 3 --
+    // -- end step 4 --
+
+    // -- step 5 --
+    // -- step 5.1 --
+    // function drawCharts() {
+    //     // clears first svg container
+    //     d3.select('svg').empty();
+    //     graphActors();
+    // }
+    // function graphActors() {
+    //     var actors = dash.createBarChart({
+    //         //  -- step 5.2 -- 
+    //         // container: '#chart1',
+    //         // groupBy: 'actor.name',
+    //         // aggregate: ADL.count(),
+    //         // -- step 5.3 --
+    //         // child: actorChart
+    //         // -- end step 5.3 --
+    //     });
+    //     // -- step 5.2 --            
+    //     // actors.clear();
+    //     // actors.draw();
+    // }
+    // -- end step 5.1 --
+
+    // -- step 5.3 --
+    // var actorChart = dash.createBarChart({
+    //     container: "#chart2",
+    //     groupBy: 'timestamp',
+    //     // -- step 5.4 --
+    //     // process: function (data, event, opts) {
+    //     //     // the map/filter functions make sure no funny statements were collected
+    //     //     // and ensure all statements have an actor and name. The event.in
+    //     //     // data is the name of the actor clicked. We only want to return his data
+    //     //     // and only if it's not undefined
+    //     //     var d = data.contents.map(function(cur, idx, arr) {
+    //     //         if (cur.actor && cur.actor.name == event.in)
+    //     //            return cur;
+    //     //     }).filter(function(n){ return n != undefined });
+    //     //     // opts callback is always needed with process. in value is the label for
+    //     //     // the out value (y-axis)
+    //     //     opts.cb( d.map(function(node) {
+    //     //         return {
+    //     //             in: node.timestamp,
+    //     //             out: node.result.extensions[baseURI + '/guess-the-number/ext/guesses'].length,
+    //     //             stmt: node
+    //     //         };
+    //     //     }) );
+    //     // },
+    //     // -- end step 5.4 --
+    //     // -- end step 5.3 --    
+    //     aggregate: ADL.count(),
+    //     // -- step 5.5 --
+    //     // customize: function (chart) {
+    //     //    chart.xAxis.rotateLabels(45);
+    //     //    chart.xAxis.tickFormat(function(d){
+    //     //        return new Date(d).toLocaleString()});
+    //     // },
+    //     //  click: function(e){
+    //     //       guesses(e);
+    //     // }
+    //     // -- end step 5.5 --
+    // });
+    // -- end step 5.3 --
+
+    // -- step 5.6 --
+    // var guesses = (function(event) {
+    //     // call the nv library and style it
+    //     var chart = nv.models.lineChart()
+    //         .useInteractiveGuideline(true)
+    //         .x(function(d) { return d[0] })
+    //         .y(function(d) { return d[1] })
+    //         .color(d3.scale.category10().range())
+    //         .duration(300)
+    //         .clipVoronoi(false)
+    //         .interpolate("cardinal")
+    //     ;
+    //     // call d3 to populate chart with data
+    //     d3.select('#chart3')
+    //         .datum(formatData(event.data))
+    //         .call(chart);
+    //     nv.utils.windowResize(chart.update);
+    //     return chart;
+    // });
+    // -- end step 5.6 --
+
+    // -- step 5.7 --    
+    // function formatData(data) {
+    //     var ret = [{key: "guess", values: []},{key: "answer", values: []}],
+    //         gs = data.stmt.result.extensions[baseURI + '/guess-the-number/ext/guesses'],
+    //         ans = data.stmt.result.extensions[baseURI + '/guess-the-number/ext/number'];
+    //     for (var i = 0; i < gs.length; i++) {
+    //         ret[0].values.push([i+1, gs[i]]);
+    //         ret[1].values.push([i+1, ans]);
+    //     }
+    //     return ret;
+    // }
+    // -- end step 5.7 --
+    // -- end step 5 --
+</script>
+</body>
+</html>

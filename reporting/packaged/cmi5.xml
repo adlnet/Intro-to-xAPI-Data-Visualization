@@ -20,6 +20,6 @@
         These charts read data from the LRS about player who play the Guess a Number game.
       </langstring>
     </description>
-    <url>./guesses.html</url>
+    <url>./reports.html</url>
   </au>
 </courseStructure>
