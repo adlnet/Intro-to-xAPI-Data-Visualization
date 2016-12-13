@@ -9,7 +9,9 @@ This small tutorial will teach you how to utilize the xAPI Dashboard to generate
   5.  create simple bar graphs
   6.  create child graphs to break the data down even further
 
-> Note: The code for each step is already included and commented out in the reports.html. If you wish, you can just uncomment the code as you walk through the steps.
+> Note: The code for each step is already included and commented out in the reports.html. If you wish, you can just uncomment the code as you walk through the steps.<br>
+    These examples use verbs defined specifically for the workshops. This is done to isolate the statements. ADL recommends looking for existing verbs and vocabularies to leverage before creating your own.
+
 
 ## Step 1 - Include the xAPI Dashboard scripts in reports.html  
 The first step is to include the xAPI Dashboard files.  
