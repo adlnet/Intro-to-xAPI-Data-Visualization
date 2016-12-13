@@ -11,6 +11,9 @@ This small tutorial will teach you how to utilize the xAPI Dashboard to generate
 
 > Note: The code for each step is already included and commented out in the reports.html. If you wish, you can just uncomment the code as you walk through the steps.
 
+    These examples use verbs defined specifically for the workshops. This is done to isolate the statements. ADL recommends looking for existing verbs and vocabularies to leverage before creating your own.
+
+
 ## Step 1 - Include the xAPI Dashboard scripts in reports.html  
 The first step is to include the xAPI Dashboard files.  
 1.  Add a `<script>` tag in the `<head>` of `reports.html` to include the necessary scripts.
